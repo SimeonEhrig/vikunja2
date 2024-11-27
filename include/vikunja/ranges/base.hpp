@@ -2,6 +2,7 @@
 
 #include <vikunja/executor.hpp>
 
+#include <experimental/mdspan>
 #include <type_traits>
 
 namespace vikunja
@@ -56,17 +57,20 @@ namespace vikunja
         template<
             typename TRangeType,
             typename TFunctor,
-            template<typename, std::size_t>
-            class TSpan,
+            template<typename, typename, typename, typename>
+            class TMDSpan,
             typename TElem,
-            std::size_t N>
+            typename TExtents,
+            typename TLayoutPolicy,
+            typename AccessorPolicy>
         struct ProxyRange
         {
+            using MDSpan = TMDSpan<TElem, TExtents, TLayoutPolicy, AccessorPolicy>;
             using Functor = TFunctor;
             using RangeType = TRangeType;
-            TSpan<TElem, N> input;
+            MDSpan input;
 
-            ProxyRange(TSpan<TElem, N> const input) : input(input)
+            ProxyRange(MDSpan const input) : input(input)
             {
             }
 
@@ -84,7 +88,14 @@ namespace vikunja
             concepts::StaticInStaticOutProxy auto operator|(TOther& other) const
             {
                 using FusedFunctor = decltype([](TElem i) { return typename TOther::Functor{}(Functor{}(i)); });
-                return detail::ProxyRange<ranges::types::StaticInStaticOut, FusedFunctor, TSpan, TElem, N>(input);
+                return detail::ProxyRange<
+                    ranges::types::StaticInStaticOut,
+                    FusedFunctor,
+                    TMDSpan,
+                    TElem,
+                    TExtents,
+                    TLayoutPolicy,
+                    AccessorPolicy>(input);
             }
 
             template<concepts::Executor TOther>

@@ -6,30 +6,37 @@
 
 namespace vikunja::ranges
 {
-    template<typename TElem, std::size_t N>
+    template<typename TElem, typename TExtents, typename TLayoutPolicy, typename AccessorPolicy>
     struct in
     {
-        std::span<TElem, N> m_input;
+        std::experimental::mdspan<TElem, TExtents, TLayoutPolicy, AccessorPolicy> m_input;
 
-        in(std::span<TElem, N> input) : m_input(input)
+        in(std::experimental::mdspan<TElem, TExtents, TLayoutPolicy, AccessorPolicy> input) : m_input(input)
         {
         }
 
         template<concepts::StaticInStaticOut TOther>
         concepts::StaticInStaticOutProxy auto operator|(TOther& other) const
         {
-            return detail::ProxyRange<ranges::types::StaticInStaticOut, typename TOther::Functor, std::span, TElem, N>(
-                m_input);
+            return detail::ProxyRange<
+                ranges::types::StaticInStaticOut,
+                typename TOther::Functor,
+                std::experimental::mdspan,
+                TElem,
+                TExtents,
+                TLayoutPolicy,
+                AccessorPolicy>(m_input);
         }
     };
 
-    template<typename TExecutor, typename TElem, std::size_t N>
+    template<typename TExecutor, typename TElem, typename TExtents, typename TLayoutPolicy, typename AccessorPolicy>
     struct out
     {
-        std::span<TElem, N> output;
+        std::experimental::mdspan<TElem, TExtents, TLayoutPolicy, AccessorPolicy> output;
         using Executor = TExecutor;
 
-        out(TExecutor, std::span<TElem, N> output) : output(output)
+        out(TExecutor, std::experimental::mdspan<TElem, TExtents, TLayoutPolicy, AccessorPolicy> output)
+            : output(output)
         {
         }
     };

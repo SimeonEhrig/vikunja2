@@ -8,10 +8,18 @@ set(CMAKE_CXX_STANDARD 20)
 option(BUILD_TESTING "Build the testing tree." OFF)
 
 include(cmake/CPM.cmake)
+CPMAddPackage("gh:kokkos/mdspan#mdspan-0.6.0")
 
 add_library(headers INTERFACE)
 target_include_directories(headers INTERFACE include)
-add_library(vikunja::vikunja ALIAS headers)
+
+add_library(vikunja INTERFACE)
+target_link_libraries(vikunja 
+    INTERFACE 
+    headers
+    std::mdspan
+)
+add_library(vikunja::vikunja ALIAS vikunja)
 
 add_executable(${CMAKE_PROJECT_NAME})
 target_sources(${CMAKE_PROJECT_NAME}
