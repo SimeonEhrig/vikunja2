@@ -10,7 +10,7 @@ namespace vikunja
             using Functor = TFunctor;
             using RangeType = ranges::types::StaticInStaticOut;
 
-            foreach(TFunctor&&)
+            foreach(TFunctor)
             {
             }
         };
