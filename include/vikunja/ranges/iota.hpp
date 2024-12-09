@@ -4,16 +4,13 @@
 
 namespace vikunja::ranges
 {
-    template<
-        typename TElem,
-        typename TExtents = std::experimental::extents<std::size_t, std::experimental::dynamic_extent>,
-        typename TLayoutPolicy = std::experimental::layout_right,
-        typename AccessorPolicy = std::experimental::default_accessor<TElem>>
+    template<typename TElem>
     struct iota
     {
-        template<typename TIElem, typename, typename, typename>
+        template<typename TIElem>
         struct IotaGen
         {
+            using type = TElem;
             TIElem begin;
             std::size_t m_size;
             TIElem step;
@@ -29,7 +26,7 @@ namespace vikunja::ranges
             }
         };
 
-        IotaGen<TElem, TExtents, TLayoutPolicy, AccessorPolicy> input;
+        IotaGen<TElem> input;
 
         iota(TElem const begin, std::size_t const size, TElem step = 1) : input({begin, size, step})
         {
@@ -38,14 +35,8 @@ namespace vikunja::ranges
         template<concepts::StaticInStaticOut TOther>
         concepts::StaticInStaticOutProxy auto operator|(TOther& other) const
         {
-            return detail::ProxyRange<
-                ranges::types::StaticInStaticOut,
-                typename TOther::Functor,
-                IotaGen,
-                TElem,
-                TExtents,
-                TLayoutPolicy,
-                AccessorPolicy>(input);
+            return detail::ProxyRange<ranges::types::StaticInStaticOut, typename TOther::Functor, IotaGen<TElem>>(
+                input);
         }
     };
 } // namespace vikunja::ranges

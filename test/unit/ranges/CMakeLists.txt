@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-set(_UNIT_TEST_NAME unitTestForeach)
+set(_UNIT_TEST_NAME unitRanges)
 
 project(${_UNIT_TEST_NAME} LANGUAGES CXX)
 
@@ -8,6 +8,7 @@ add_executable(${_UNIT_TEST_NAME})
 target_sources(${_UNIT_TEST_NAME}
     PRIVATE
     foreach.cpp
+    io_input_concept.cpp
 )
 target_link_libraries(${_UNIT_TEST_NAME}
     PRIVATE

@@ -8,21 +8,41 @@
 namespace vikunja
 {
     // defines how number of input and output elements of range behaves
-    namespace ranges::types
+    namespace ranges
     {
-        // no input data
-        // static number of output elements
-        // e.g. data generator algorithm
-        struct NoInStaticOut
+        namespace types
         {
-        };
+            // no input data
+            // static number of output elements
+            // e.g. data generator algorithm
+            struct NoInStaticOut
+            {
+            };
 
-        // static number of equal in- and output elements
-        struct StaticInStaticOut
+            // static number of equal in- and output elements
+            struct StaticInStaticOut
+            {
+            };
+        } // namespace types
+
+        namespace detail
         {
-        };
+            // get element type of storage
+            template<typename TStorage>
+            struct MemoryInterfaceElem
+            {
+                using type = typename TStorage::type;
+            };
 
-    } // namespace ranges::types
+            template<typename TElem, typename TExtents, typename TLayout, typename TAccesorPolicy>
+            struct MemoryInterfaceElem<std::experimental::mdspan<TElem, TExtents, TLayout, TAccesorPolicy>>
+            {
+                using type = TElem;
+            };
+
+        } // namespace detail
+
+    } // namespace ranges
 
     namespace concepts
     {
@@ -50,52 +70,46 @@ namespace vikunja
 
         template<typename T>
         concept StaticInStaticOutProxy = StaticInStaticOut<T> && ProxyRange<T>;
+
+        template<typename T, typename... TArgs>
+        concept SameOr = (std::same_as<T, TArgs> || ...);
+
+        namespace details
+        {
+            template<typename T>
+            concept MemoryInterface = requires(T t) {
+                typename vikunja::ranges::detail::MemoryInterfaceElem<T>::type;
+                {
+                    t.size()
+                } -> std::integral;
+                {
+                    t[0]
+                } -> SameOr<
+                    typename vikunja::ranges::detail::MemoryInterfaceElem<T>::type,
+                    typename vikunja::ranges::detail::MemoryInterfaceElem<T>::type&>;
+            };
+        } // namespace details
     } // namespace concepts
 
     namespace ranges::detail
     {
-        template<
-            typename TRangeType,
-            typename TFunctor,
-            template<typename, typename, typename, typename>
-            class TMDSpan,
-            typename TElem,
-            typename TExtents,
-            typename TLayoutPolicy,
-            typename AccessorPolicy>
+        template<typename TRangeType, typename TFunctor, vikunja::concepts::details::MemoryInterface TStorage>
         struct ProxyRange
         {
-            using MDSpan = TMDSpan<TElem, TExtents, TLayoutPolicy, AccessorPolicy>;
             using Functor = TFunctor;
             using RangeType = TRangeType;
-            MDSpan input;
+            TStorage input;
 
-            ProxyRange(MDSpan const input) : input(input)
+            ProxyRange(TStorage const input) : input(input)
             {
             }
-
-            //     template<concepts::StaticInStaticOutProxy TOther>
-            // concepts::StaticInStaticOutProxy auto operator|(TOther& other) const
-            // {
-            //     //TOther::Functor;
-            //     //using Functor = decltype([](TElem i) { return TOther::Functor{}(Functor{}(TElem{})); });
-            //     using FusedFunctor = decltype([](TElem i) { return typename TOther::Functor{}(Functor{}(i)); });
-            //     return detail::ProxyRange<ranges::types::StaticInStaticOut, FusedFunctor, TElem, N>(
-            //         other.input);
-            // }
 
             template<concepts::StaticInStaticOut TOther>
             concepts::StaticInStaticOutProxy auto operator|(TOther& other) const
             {
+                using TElem = vikunja::ranges::detail::MemoryInterfaceElem<TStorage>::type;
                 using FusedFunctor = decltype([](TElem i) { return typename TOther::Functor{}(Functor{}(i)); });
-                return detail::ProxyRange<
-                    ranges::types::StaticInStaticOut,
-                    FusedFunctor,
-                    TMDSpan,
-                    TElem,
-                    TExtents,
-                    TLayoutPolicy,
-                    AccessorPolicy>(input);
+                return detail::ProxyRange<ranges::types::StaticInStaticOut, FusedFunctor, TStorage>(input);
             }
 
             template<concepts::Executor TOther>
