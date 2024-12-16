@@ -6,6 +6,7 @@ project(vikunja2 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 
 option(BUILD_TESTING "Build the testing tree." OFF)
+option(vikunja_EXAMPLES "Build the vikunja examples." OFF)
 
 include(cmake/CPM.cmake)
 CPMAddPackage("gh:kokkos/mdspan#mdspan-0.6.0")
@@ -21,14 +22,11 @@ target_link_libraries(vikunja
 )
 add_library(vikunja::vikunja ALIAS vikunja)
 
-add_executable(${CMAKE_PROJECT_NAME})
-target_sources(${CMAKE_PROJECT_NAME}
-    PRIVATE
-    main.cpp
-)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE vikunja::vikunja)
+if(vikunja_EXAMPLES)
+    message(STATUS "enable examples")
+    add_subdirectory(examples)
+endif()
 
-# TODO set as option
 if(BUILD_TESTING)
     message(STATUS "enable testing")
     enable_testing()

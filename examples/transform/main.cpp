@@ -23,20 +23,5 @@ int main(int argc, char** argv)
     }
     std::cout << "\n";
 
-    constexpr std::size_t gen_size = 12;
-
-    std::vector<float> vOut2(gen_size);
-
-    vikunja::ranges::out out2{vikunja::executor::CPU{}, std::experimental::mdspan(vOut2.data(), vOut2.size())};
-
-    vikunja::ranges::iota iota(4.1f, gen_size, 2.f);
-    iota | foreach1 | foreach2 | out2;
-
-    for(auto e : vOut2)
-    {
-        std::cout << e << " ";
-    }
-    std::cout << "\n";
-
     return 0;
 }
