@@ -3,6 +3,7 @@
 #include <vikunja/executor.hpp>
 
 #include <experimental/mdspan>
+#include <span>
 #include <type_traits>
 
 namespace vikunja
@@ -36,6 +37,12 @@ namespace vikunja
 
             template<typename TElem, typename TExtents, typename TLayout, typename TAccesorPolicy>
             struct MemoryInterfaceElem<std::experimental::mdspan<TElem, TExtents, TLayout, TAccesorPolicy>>
+            {
+                using type = TElem;
+            };
+
+            template<typename TElem, std::size_t Extent>
+            struct MemoryInterfaceElem<std::span<TElem, Extent>>
             {
                 using type = TElem;
             };
