@@ -9,6 +9,7 @@ target_sources(${_UNIT_TEST_NAME}
     PRIVATE
     foreach.cpp
     io_input_concept.cpp
+    proxyRange.cpp
 )
 target_link_libraries(${_UNIT_TEST_NAME}
     PRIVATE

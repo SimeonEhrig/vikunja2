@@ -119,8 +119,26 @@ namespace vikunja
                 return detail::ProxyRange<ranges::types::StaticInStaticOut, FusedFunctor, TStorage>(input);
             }
 
+            template<concepts::StaticInStaticOut TOther>
+            concepts::StaticInStaticOutProxy auto operator|(TOther&& other) const
+            {
+                using TElem = vikunja::ranges::detail::MemoryInterfaceElem<TStorage>::type;
+                using FusedFunctor = decltype([](TElem i) { return typename TOther::Functor{}(Functor{}(i)); });
+                return detail::ProxyRange<ranges::types::StaticInStaticOut, FusedFunctor, TStorage>(input);
+            }
+
             template<concepts::Executor TOther>
             void operator|(TOther& other) const
+            {
+                Functor f{};
+                for(auto i = 0; i < input.size(); ++i)
+                {
+                    other.output[i] = f(input[i]);
+                }
+            }
+
+            template<concepts::Executor TOther>
+            void operator|(TOther&& other) const
             {
                 Functor f{};
                 for(auto i = 0; i < input.size(); ++i)

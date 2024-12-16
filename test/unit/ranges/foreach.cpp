@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <vikunja/ranges/foreach.hpp>
 
-TEST_CASE("vikunja::ranges::foreach constructor", "[ranges][foreach]")
+TEST_CASE("vikunja::ranges::foreach constructor", "[unit][ranges][foreach]")
 {
     auto f = [](int i) { return i * 2; };
 

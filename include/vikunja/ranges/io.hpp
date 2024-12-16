@@ -20,6 +20,12 @@ namespace vikunja::ranges
         {
             return detail::ProxyRange<ranges::types::StaticInStaticOut, typename TOther::Functor, TStorage>(m_input);
         }
+
+        template<concepts::StaticInStaticOut TOther>
+        concepts::StaticInStaticOutProxy auto operator|(TOther&& other) const
+        {
+            return detail::ProxyRange<ranges::types::StaticInStaticOut, typename TOther::Functor, TStorage>(m_input);
+        }
     };
 
     template<typename TExecutor, vikunja::concepts::details::MemoryInterface TStorage>

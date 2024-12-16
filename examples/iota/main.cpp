@@ -1,20 +1,19 @@
 #include <vikunja/vikunja.hpp>
 
-#include <experimental/mdspan>
 #include <iostream>
 #include <span>
 #include <vector>
 
 int main(int argc, char** argv)
 {
+    namespace vkr = vikunja::ranges;
     constexpr std::size_t gen_size = 12;
     std::vector<float> vOut(gen_size);
 
-    vikunja::ranges::foreach foreach([](float i) { return i * 2.f; });
-    vikunja::ranges::out out{vikunja::executor::CPU{}, std::experimental::mdspan(vOut.data(), vOut.size())};
+    vkr::iota iota(4.1f, gen_size, 2.f);
+    vkr::out out{vikunja::executor::CPU{}, std::span(vOut)};
 
-    vikunja::ranges::iota iota(4.1f, gen_size, 2.f);
-    iota | foreach | out;
+    iota | vkr::foreach([](float i) { return i * 2.f; }) | out;
 
     for(auto e : vOut)
     {

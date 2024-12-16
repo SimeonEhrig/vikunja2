@@ -38,5 +38,12 @@ namespace vikunja::ranges
             return detail::ProxyRange<ranges::types::StaticInStaticOut, typename TOther::Functor, IotaGen<TElem>>(
                 input);
         }
+
+        template<concepts::StaticInStaticOut TOther>
+        concepts::StaticInStaticOutProxy auto operator|(TOther&& other) const
+        {
+            return detail::ProxyRange<ranges::types::StaticInStaticOut, typename TOther::Functor, IotaGen<TElem>>(
+                input);
+        }
     };
 } // namespace vikunja::ranges

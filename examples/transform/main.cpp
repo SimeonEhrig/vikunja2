@@ -2,7 +2,6 @@
 
 #include <experimental/mdspan>
 #include <iostream>
-#include <span>
 #include <vector>
 
 int main(int argc, char** argv)
