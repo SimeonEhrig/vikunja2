@@ -1,0 +1,4 @@
+[submodule "alpaka2"]
+	path = alpaka2
+	url = https://github.com/SimeonEhrig/alpaka2.git
+	branch = vikunja
